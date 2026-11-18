@@ -1,0 +1,27 @@
+{
+  "name": "sturdy-spork",
+  "version": "1.0.0",
+  "description": "University project built using HTML, CSS, JavaScript, Node.js, Express, and SQLite.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdallataha0557/sturdy-spork.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/abdallataha0557/sturdy-spork/issues"
+  },
+  "homepage": "https://github.com/abdallataha0557/sturdy-spork#readme",
+  "dependencies": {
+    "better-sqlite3": "^13.2.0",
+    "express": "^5.3.0"
+  }
+}
