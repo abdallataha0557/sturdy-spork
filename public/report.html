@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Report an Item</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 30px auto; padding: 0 16px; }
+    label { display: block; margin-top: 14px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+    #message { margin-top: 16px; font-weight: bold; }
+    .ok { color: #2e8b57; }
+    .error { color: #d9534f; }
+  </style>
+</head>
+<body>
+  <h1>Report an Item</h1>
+
+  <form id="reportForm">
+    <label for="report_type">Type</label>
+    <select id="report_type" required>
+      <option value="Lost">Lost</option>
+      <option value="Found">Found</option>
+    </select>
+
+    <label for="item_name">Item name</label>
+    <input id="item_name" type="text" required>
+
+    <label for="description">Description</label>
+    <textarea id="description" rows="3" required></textarea>
+
+    <label for="location">Location</label>
+    <input id="location" type="text" required>
+
+    <label for="report_date">Date</label>
+    <input id="report_date" type="date" required>
+
+    <button type="submit">Submit report</button>
+  </form>
+
+  <div id="message"></div>
+
+  <script>
+    document.getElementById("report_date").valueAsDate = new Date();
+
+    document.getElementById("reportForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = document.getElementById("message");
+
+      const body = {
+        item_name: document.getElementById("item_name").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        report_date: document.getElementById("report_date").value,
+        report_type: document.getElementById("report_type").value
+      };
+
+      try {
+        const res = await fetch("/api/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+
+        message.textContent = data.message;
+        message.className = data.success ? "ok" : "error";
+
+        if (data.success) {
+          document.getElementById("reportForm").reset();
+          document.getElementById("report_date").valueAsDate = new Date();
+        }
+      } catch (err) {
+        message.textContent = "Could not reach the server.";
+        message.className = "error";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 16px; }
+    .top { display: flex; justify-content: space-between; align-items: center; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+    .card.returned { opacity: 0.6; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; color: #fff; margin-right: 6px; }
+    .Lost { background: #d9534f; }
+    .Found { background: #2e8b57; }
+    .Returned { background: #666; }
+    .Active { background: #337ab7; }
+    .meta { color: #666; font-size: 14px; margin: 6px 0 10px; }
+    button { padding: 8px 14px; cursor: pointer; }
+    #message { margin-bottom: 12px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>Admin Dashboard</h1>
+    <button id="logout">Log out</button>
+  </div>
+
+  <div id="message"></div>
+  <div id="items"></div>
+
+  <script>
+    async function checkLogin() {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (!data.loggedIn) {
+        window.location.href = "/login.html";
+        return false;
+      }
+      return true;
+    }
+
+    async function loadItems() {
+      const container = document.getElementById("items");
+      try {
+        const res = await fetch("/api/items");
+        const data = await res.json();
+        render(data.items);
+      } catch (err) {
+        container.textContent = "Could not load reports.";
+      }
+    }
+
+    function render(items) {
+      const container = document.getElementById("items");
+      container.innerHTML = "";
+
+      if (items.length === 0) {
+        container.textContent = "No reports yet.";
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card" + (item.status === "Returned" ? " returned" : "");
+
+        const typeBadge = document.createElement("span");
+        typeBadge.className = "badge " + item.report_type;
+        typeBadge.textContent = item.report_type;
+
+        const statusBadge = document.createElement("span");
+        statusBadge.className = "badge " + item.status;
+        statusBadge.textContent = item.status;
+
+        const title = document.createElement("h3");
+        title.textContent = item.item_name;
+
+        const desc = document.createElement("p");
+        desc.textContent = item.description;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = item.location + " • " + item.report_date;
+
+        const btn = document.createElement("button");
+        const newStatus = item.status === "Active" ? "Returned" : "Active";
+        btn.textContent = "Mark as " + newStatus;
+        btn.addEventListener("click", () => updateStatus(item.id, newStatus));
+
+        card.append(typeBadge, statusBadge, title, desc, meta, btn);
+        container.appendChild(card);
+      });
+    }
+
+    async function updateStatus(id, status) {
+      const message = document.getElementById("message");
+      try {
+        const res = await fetch("/api/items/" + id + "/status", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status })
+        });
+
+        if (res.status === 401) {
+          window.location.href = "/login.html";
+          return;
+        }
+
+        const data = await res.json();
+        message.textContent = data.message;
+        loadItems();
+      } catch (err) {
+        message.textContent = "Could not reach the server.";
+      }
+    }
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await fetch("/api/auth/logout", { method: "POST" });
+      window.location.href = "/login.html";
+    });
+
+    checkLogin().then(ok => { if (ok) loadItems(); });
+  </script>
+</body>
+</html>

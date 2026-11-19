@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lost & Found</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 0 16px; }
+    #search { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 12px; font-size: 16px; }
+    .filters { margin-bottom: 20px; display: flex; gap: 8px; }
+    .filters button { padding: 8px 16px; border: 1px solid #888; background: #fff; cursor: pointer; border-radius: 6px; }
+    .filters button.active { background: #222; color: #fff; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+    .card.returned { opacity: 0.6; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; color: #fff; margin-right: 6px; }
+    .Lost { background: #d9534f; }
+    .Found { background: #2e8b57; }
+    .Returned { background: #666; }
+    .Active { background: #337ab7; }
+    .meta { color: #666; font-size: 14px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Lost & Found</h1>
+
+  <input id="search" type="text" placeholder="Search by name, description, or location...">
+
+  <div class="filters">
+    <button data-filter="All" class="active">All</button>
+    <button data-filter="Lost">Lost</button>
+    <button data-filter="Found">Found</button>
+  </div>
+
+  <div id="items"></div>
+
+  <script>
+    let currentFilter = "All";
+
+    async function loadItems() {
+      const params = new URLSearchParams();
+      const search = document.getElementById("search").value.trim();
+      if (search) params.set("search", search);
+      if (currentFilter !== "All") params.set("type", currentFilter);
+
+      const container = document.getElementById("items");
+
+      try {
+        const res = await fetch("/api/items?" + params.toString());
+        const data = await res.json();
+        render(data.items);
+      } catch (err) {
+        container.textContent = "Could not load reports.";
+      }
+    }
+
+    function render(items) {
+      const container = document.getElementById("items");
+      container.innerHTML = "";
+
+      if (items.length === 0) {
+        container.textContent = "No reports found.";
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card" + (item.status === "Returned" ? " returned" : "");
+
+        const typeBadge = document.createElement("span");
+        typeBadge.className = "badge " + item.report_type;
+        typeBadge.textContent = item.report_type;
+
+        const statusBadge = document.createElement("span");
+        statusBadge.className = "badge " + item.status;
+        statusBadge.textContent = item.status;
+
+        const title = document.createElement("h3");
+        title.textContent = item.item_name;
+
+        const desc = document.createElement("p");
+        desc.textContent = item.description;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = item.location + " • " + item.report_date;
+
+        card.append(typeBadge, statusBadge, title, desc, meta);
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", loadItems);
+
+    document.querySelectorAll(".filters button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelector(".filters .active").classList.remove("active");
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        loadItems();
+      });
+    });
+
+    loadItems();
+  </script>
+</body>
+</html>
