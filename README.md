@@ -2,8 +2,9 @@
 
 A web application where students report lost and found items on campus, and administrators mark items as returned.
 
-**Author:** YOUR NAME
-**Course:** YOUR COURSE NAME AND CODE
+  **Author:** Abdalla Taha Ibrahim-237001
+  Seif Islam-230647
+**Course:** Web design -cse5531
 **University:** MSA University
 
 ## Features
