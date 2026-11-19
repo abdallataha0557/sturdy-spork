@@ -2,14 +2,15 @@
 
 A web application where students report lost and found items on campus, and administrators mark items as returned.
 
-  **Author:** Abdalla Taha Ibrahim-237001
-  Seif Islam-230647
-**Course:** Web design -cse5531
+**Author:** Abdalla Taha -237001
+Seif Islam -230647
+**Course:** Web design -CSE5531
 **University:** MSA University
 
 ## Features
 
 - Report a lost or found item through a form
+- Home page with a search bar and the most recent active reports
 - Browse all reports on a public page
 - Search by item name, description, or location
 - Filter by Lost or Found
@@ -29,11 +30,15 @@ A web application where students report lost and found items on campus, and admi
 
 ```
 public/
-  index.html      Home page
+  index.html      Home page with search and recent reports
   report.html     Report form
   browse.html     Browse, search, and filter
   login.html      Admin login
   admin.html      Admin dashboard
+  css/
+    style.css     Shared design (navy and amber theme)
+  js/
+    layout.js     Shared header and footer for every page
 src/
   database/
     db.js             Database connection and tables
@@ -89,6 +94,16 @@ Notes:
 - Run the command from the main project folder (`/workspaces/sturdy-spork` in Codespaces), not from inside `src`.
 - To create more admins, run the same command again with a different username.
 
+## User Interface
+
+The interface uses a shared design so every page looks the same:
+
+- `public/css/style.css` holds the colors, cards, forms, and buttons
+- `public/js/layout.js` adds the same header and footer to every page
+- The home page has a search bar and shows the most recent active reports
+- The Lost and Found links in the menu open the browse page already filtered
+- The Report Lost and Report Found links open the form with the right type selected
+
 ## API Endpoints
 
 | Method | Route | Access | Description |
@@ -121,19 +136,24 @@ Notes:
 
 | # | Test | Result |
 |---|------|--------|
-| 1 | Submit a valid report | Passed |
-| 2 | Report appears on the browse page | Passed |
-| 3 | Data persists after server restart | Passed |
-| 4 | Search by keyword | Passed |
-| 5 | Filter by Lost or Found | Passed |
-| 6 | Search with no match shows a message | Passed |
-| 7 | Empty field is rejected | Passed |
-| 8 | Invalid report type is rejected | Passed |
-| 9 | Admin page redirects when logged out | Passed |
-| 10 | Wrong password is rejected | Passed |
-| 11 | Status update blocked when logged out | Passed |
-| 12 | Admin login and status update | Passed |
-| 13 | Status change shows on the public page | Passed |
+| 1 | Home page loads with search and recent reports | Passed |
+| 2 | Submit a valid report | Passed |
+| 3 | Report appears on the browse page | Passed |
+| 4 | Data persists after server restart | Passed |
+| 5 | Search by keyword | Passed |
+| 6 | Search from the home page opens the browse page with results | Passed |
+| 7 | Filter by Lost | Passed |
+| 8 | Search with no match shows a message | Passed |
+| 9 | Report Found link preselects the Found type | Passed |
+| 10 | Empty field is rejected | Passed |
+| 11 | Invalid report type is rejected | Passed |
+| 12 | Admin page redirects when logged out | Passed |
+| 13 | Wrong password is rejected | Passed |
+| 14 | Status update blocked when logged out | Passed |
+| 15 | Admin login shows the dashboard | Passed |
+| 16 | Mark as Returned updates the card | Passed |
+| 17 | Status change shows on the public page | Passed |
+| 18 | Log out blocks the dashboard again | Passed |
 
 Screenshots for each test are in the project report.
 
